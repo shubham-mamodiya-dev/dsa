@@ -31,8 +31,12 @@ impl<T: Eq + Hash + Clone> Graph<T> {
         }
 
         if let (Some(index_x), Some(index_y)) = (self.index.get(&x), self.index.get(&y)) {
-            self.adj[*index_x].push(*index_y);
-            self.adj[*index_y].push(*index_x);
+            if !self.adj[*index_x].contains(index_y) {
+                self.adj[*index_x].push(*index_y);
+            }
+            if !self.adj[*index_y].contains(index_x) {
+                self.adj[*index_y].push(*index_x);
+            }
         };
     }
 
