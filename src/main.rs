@@ -1,3 +1,5 @@
+use dsa::Graph;
 fn main() {
-    todo!();
+    let _g: Graph<i32> = Graph::new();
+    let _g: Graph<String> = Graph::default();
 }
