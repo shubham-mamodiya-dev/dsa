@@ -78,4 +78,13 @@ impl<T: Eq + Hash + Clone> Graph<T> {
     pub fn contains(&self, v: &T) -> bool {
         self.index.contains_key(v)
     }
+
+    /// Returns number of vertices in the graph
+    pub fn count(&self) -> usize {
+        self.values.len()
+    }
+
+    pub fn count_edges(&self) -> usize {
+        self.adj.iter().map(|x| x.len()).sum::<usize>() / 2
+    }
 }
