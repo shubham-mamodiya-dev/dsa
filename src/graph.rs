@@ -58,18 +58,12 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
         self.index.insert(v, index);
     }
 
-    pub fn adjcent_vertices(&self, v: &T) -> Vec<T> {
-        let adjcent_vertices: Vec<T> = {
-            match self.index.get(v) {
-                Some(&x) => self.adj[x].clone(),
-                None => Vec::new(),
-            }
-        }
-        .iter()
-        .map(|&x| self.values[x].clone())
-        .collect();
-
-        adjcent_vertices
+    pub fn adjacent_vertices(&self, v: &T) -> impl Iterator<Item = &T> {
+        self.index
+            .get(v)
+            .into_iter()
+            .flat_map(move |&x| self.adj[x].iter())
+            .map(|&x| &self.values[x])
     }
 
     /// Checks if Vertex exists in the graph
@@ -88,8 +82,8 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
         self.adj.iter().map(|x| x.len()).sum::<usize>() / 2
     }
 
-    pub fn vertices(&self) -> Vec<T> {
-        self.values.clone()
+    pub fn vertices(&self) -> impl Iterator<Item = &T> {
+        self.values.iter()
     }
 
     pub fn is_edge(&self, x: &T, y: &T) -> bool {

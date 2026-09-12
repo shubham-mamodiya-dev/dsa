@@ -25,7 +25,9 @@ fn main() {
         }
     }
     println!("Graph: {:#?}", g);
-    g.adjcent_vertices(&4);
+    for x in g.adjacent_vertices(&4) {
+        print!("{}, ", x);
+    }
 
     let mut g = Graph::new();
 
@@ -35,6 +37,5 @@ fn main() {
     g.add_edge("ss", "sb");
     g.add_edge("ss", "sa");
     g.add_edge("sb", "sa");
-    g.adjcent_vertices(&"ss");
     println!("Graph: {:#?}", g);
 }
