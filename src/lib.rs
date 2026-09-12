@@ -1,1 +1,1 @@
-include!("graph.rs");
+pub mod graph;

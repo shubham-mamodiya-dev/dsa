@@ -5,6 +5,7 @@ use std::hash::Hash;
 pub struct Graph<T> {
     adj: Vec<Vec<usize>>,
     index: HashMap<T, usize>,
+    values: Vec<T>,
 }
 
 impl<T: Eq + Hash + Clone> Graph<T> {
@@ -12,6 +13,7 @@ impl<T: Eq + Hash + Clone> Graph<T> {
         Self {
             adj: Vec::new(),
             index: HashMap::new(),
+            values: Vec::new(),
         }
     }
 
@@ -30,6 +32,7 @@ impl<T: Eq + Hash + Clone> Graph<T> {
             self.add_vertex(y.clone());
         }
 
+        // they always exists so Some is okay for both
         if let (Some(index_x), Some(index_y)) = (self.index.get(&x), self.index.get(&y)) {
             if !self.adj[*index_x].contains(index_y) {
                 self.adj[*index_x].push(*index_y);
@@ -46,8 +49,16 @@ impl<T: Eq + Hash + Clone> Graph<T> {
     pub fn add_vertex(&mut self, v: T) {
         let index = self.adj.len();
         if !self.index.contains_key(&v) {
+            self.values.push(v.clone());
             self.adj.push(Vec::new());
+            self.index.insert(v, index);
         }
-        self.index.entry(v).or_insert(index);
     }
+
+    // pub fn adj(&self, v: &T) -> impl Iterator<Item = &T> {
+    //     match self.index.get(v) {
+    //         None => Vec::new().iter(),
+    //         Some(&index) => Vec::new().iter(),
+    //     }
+    // }
 }
