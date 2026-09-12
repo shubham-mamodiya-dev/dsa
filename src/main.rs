@@ -25,11 +25,16 @@ fn main() {
         }
     }
     println!("Graph: {:#?}", g);
+    g.adjcent_vertices(&4);
 
     let mut g = Graph::new();
 
-    g.add_vertex("sh");
-    g.add_edge("sa", "sb");
-
+    g.add_vertex("ss");
+    g.add_vertex("sa");
+    g.add_vertex("sb");
+    g.add_edge("ss", "sb");
+    g.add_edge("ss", "sa");
+    g.add_edge("sb", "sa");
+    g.adjcent_vertices(&"ss");
     println!("Graph: {:#?}", g);
 }

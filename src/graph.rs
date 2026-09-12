@@ -25,40 +25,57 @@ impl<T: Eq + Hash + Clone> Graph<T> {
         if x == y {
             return;
         }
-        if !(self.index.contains_key(&x)) {
+        if !(self.contains(&x)) {
             self.add_vertex(x.clone());
         }
-        if !(self.index.contains_key(&y)) {
+        if !(self.contains(&y)) {
             self.add_vertex(y.clone());
         }
 
-        // they always exists so Some is okay for both
-        if let (Some(index_x), Some(index_y)) = (self.index.get(&x), self.index.get(&y)) {
-            if !self.adj[*index_x].contains(index_y) {
-                self.adj[*index_x].push(*index_y);
+        // We can assume x and y exists as vertices.
+        if let (Some(&x), Some(&y)) = (self.index.get(&x), self.index.get(&y)) {
+            if !self.adj[x].contains(&y) {
+                self.adj[x].push(y);
             }
-            if !self.adj[*index_y].contains(index_x) {
-                self.adj[*index_y].push(*index_x);
+            if !self.adj[y].contains(&x) {
+                self.adj[y].push(x);
             }
         };
     }
 
-    /// Adds vertes in the graph only if it don't exist yet.
+    /// Adds vertex in the graph only if it doesn't exist yet.
     ///
     /// * `v`: The vertex
     pub fn add_vertex(&mut self, v: T) {
-        let index = self.adj.len();
-        if !self.index.contains_key(&v) {
-            self.values.push(v.clone());
-            self.adj.push(Vec::new());
-            self.index.insert(v, index);
+        if self.contains(&v) {
+            return;
         }
+
+        // only add vertex if it d
+        let index = self.adj.len();
+        self.values.push(v.clone());
+        self.adj.push(Vec::new());
+        self.index.insert(v, index);
     }
 
-    // pub fn adj(&self, v: &T) -> impl Iterator<Item = &T> {
-    //     match self.index.get(v) {
-    //         None => Vec::new().iter(),
-    //         Some(&index) => Vec::new().iter(),
-    //     }
-    // }
+    pub fn adjcent_vertices(&self, v: &T) -> Vec<T> {
+        let adjcent_vertices: Vec<T> = {
+            match self.index.get(v) {
+                Some(&x) => self.adj[x].clone(),
+                None => Vec::new(),
+            }
+        }
+        .iter()
+        .map(|&x| self.values[x].clone())
+        .collect();
+
+        adjcent_vertices
+    }
+
+    /// Checks if Vertex exists in the graph
+    ///
+    /// * `v`: Vertex
+    pub fn contains(&self, v: &T) -> bool {
+        self.index.contains_key(v)
+    }
 }
