@@ -1,4 +1,3 @@
-use std::clone;
 use std::collections::HashMap;
 use std::hash::Hash;
 
@@ -26,6 +25,9 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
         if x == y {
             return;
         }
+
+        // add_vertex checks only add vertex if it doesn't exist. But, for new
+        // lets keep validation here just for explicitness
         if !(self.contains(&x)) {
             self.add_vertex(x.clone());
         }
@@ -35,9 +37,12 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
 
         // We can assume x and y exists as vertices.
         if let (Some(&x), Some(&y)) = (self.index.get(&x), self.index.get(&y)) {
+            // only add an edge if it doesn't exist
             if !self.adj[x].contains(&y) {
                 self.adj[x].push(y);
             }
+
+            // only add an edge if it doesn't exist
             if !self.adj[y].contains(&x) {
                 self.adj[y].push(x);
             }
@@ -52,7 +57,7 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
             return;
         }
 
-        // only add vertex if it doesn't exists
+        // only add vertex if it doesn't exist
         let index = self.adj.len();
         self.values.push(v.clone());
         self.adj.push(Vec::new());
@@ -158,5 +163,32 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
 
     pub fn contains(&self, v: &T) -> bool {
         self.index.contains_key(v)
+    }
+
+    /// Adds edge between x and y. If they don't exist then it creates them.
+    ///
+    /// * `x`: vertex
+    /// * `y`: vertex
+    pub fn add_edge(&mut self, x: T, y: T) {
+        if x == y {
+            return;
+        }
+
+        // add_vertex checks only add vertex if it doesn't exist. But, for new
+        // lets keep validation here just for explicitness
+        if !(self.contains(&x)) {
+            self.add_vertex(x.clone());
+        }
+        if !(self.contains(&y)) {
+            self.add_vertex(y.clone());
+        }
+
+        // We can assume x and y exists as vertices.
+        if let (Some(&x), Some(&y)) = (self.index.get(&x), self.index.get(&y)) {
+            // only add an edge if it doesn't exist
+            if !self.adj[x].contains(&y) {
+                self.adj[x].push(y);
+            }
+        };
     }
 }
