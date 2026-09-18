@@ -1,9 +1,9 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
 
 #[derive(Debug, Default)]
 pub struct Graph<T> {
-    adj: Vec<Vec<usize>>,
+    adj: Vec<HashSet<usize>>,
     index: HashMap<T, usize>,
     values: Vec<T>,
 }
@@ -37,15 +37,8 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
 
         // We can assume x and y exists as vertices.
         if let (Some(&x), Some(&y)) = (self.index.get(&x), self.index.get(&y)) {
-            // only add an edge if it doesn't exist
-            if !self.adj[x].contains(&y) {
-                self.adj[x].push(y);
-            }
-
-            // only add an edge if it doesn't exist
-            if !self.adj[y].contains(&x) {
-                self.adj[y].push(x);
-            }
+            self.adj[x].insert(y);
+            self.adj[y].insert(x);
         };
     }
 
@@ -60,7 +53,7 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
         // only add vertex if it doesn't exist
         let index = self.adj.len();
         self.values.push(v.clone());
-        self.adj.push(Vec::new());
+        self.adj.push(HashSet::new());
         self.index.insert(v, index);
     }
 
@@ -136,7 +129,7 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
 
 #[derive(Debug, Default)]
 pub struct Diagraph<T> {
-    adj: Vec<Vec<usize>>,
+    adj: Vec<HashSet<usize>>,
     values: Vec<T>,
     index: HashMap<T, usize>,
 }
@@ -158,7 +151,7 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
         let index = self.adj.len();
         self.index.insert(v.clone(), index);
         self.values.push(v);
-        self.adj.push(Vec::new());
+        self.adj.push(HashSet::new());
     }
 
     pub fn contains(&self, v: &T) -> bool {
@@ -186,9 +179,53 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
         // We can assume x and y exists as vertices.
         if let (Some(&x), Some(&y)) = (self.index.get(&x), self.index.get(&y)) {
             // only add an edge if it doesn't exist
-            if !self.adj[x].contains(&y) {
-                self.adj[x].push(y);
-            }
+            self.adj[x].insert(y);
         };
+    }
+    /// Returns all the vertices that are adjacent to v.
+    ///
+    /// * `v`: vertex
+    pub fn adjacent_vertices(&self, v: &T) -> impl Iterator<Item = &T> {
+        self.index
+            .get(v)
+            .into_iter()
+            .flat_map(move |&x| self.adj[x].iter())
+            .map(|&x| &self.values[x])
+    }
+    /// Returns number of vertices in the graph
+    pub fn count_vertices(&self) -> usize {
+        self.values.len()
+    }
+
+    pub fn count_edges(&self) -> usize {
+        self.adj.iter().map(|x| x.len()).sum::<usize>()
+    }
+
+    pub fn vertices(&self) -> impl Iterator<Item = &T> {
+        self.values.iter()
+    }
+
+    /// return true if there is an edge between x and y. It cares about
+    /// direction from x to y not y to x
+    ///
+    /// * `x`:  vertex
+    /// * `y`: vertex
+    pub fn is_edge(&self, x: &T, y: &T) -> bool {
+        if !self.contains(x) || !self.contains(y) {
+            return false;
+        }
+
+        if x == y {
+            return true;
+        }
+
+        let x_index = self.index.get(x);
+        let y_index = self.index.get(y);
+
+        if let (Some(&x_index), Some(y_index)) = (x_index, y_index) {
+            self.adj[x_index].contains(y_index)
+        } else {
+            false
+        }
     }
 }
