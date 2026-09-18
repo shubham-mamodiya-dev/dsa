@@ -1,3 +1,4 @@
+use std::clone;
 use std::collections::HashMap;
 use std::hash::Hash;
 
@@ -51,7 +52,7 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
             return;
         }
 
-        // only add vertex if it d
+        // only add vertex if it doesn't exists
         let index = self.adj.len();
         self.values.push(v.clone());
         self.adj.push(Vec::new());
@@ -125,5 +126,37 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
 
     pub fn average_degree(&self) -> f64 {
         2.0 * self.count_edges() as f64 / self.count_vertices() as f64
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct Diagraph<T> {
+    adj: Vec<Vec<usize>>,
+    values: Vec<T>,
+    index: HashMap<T, usize>,
+}
+
+impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
+    pub fn new() -> Self {
+        Self {
+            adj: Vec::new(),
+            values: Vec::new(),
+            index: HashMap::new(),
+        }
+    }
+
+    pub fn add_vertex(&mut self, v: T) {
+        if self.contains(&v) {
+            return;
+        }
+
+        let index = self.adj.len();
+        self.index.insert(v.clone(), index);
+        self.values.push(v);
+        self.adj.push(Vec::new());
+    }
+
+    pub fn contains(&self, v: &T) -> bool {
+        self.index.contains_key(v)
     }
 }
