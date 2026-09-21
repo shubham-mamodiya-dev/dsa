@@ -229,3 +229,8 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
         }
     }
 }
+
+trait Finder<T> {
+    fn dfs(&self, v: T, w: T) -> impl Iterator<Item = T>;
+    fn bfs(&self, v: T, w: T) -> impl Iterator<Item = T>;
+}
