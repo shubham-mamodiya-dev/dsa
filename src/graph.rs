@@ -58,8 +58,7 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
     }
 
     pub fn adjacent_vertices(&self, v: &T) -> impl Iterator<Item = &T> {
-        self.index
-            .get(v)
+        self.get_index(v)
             .into_iter()
             .flat_map(move |&x| self.adj[x].iter())
             .map(|&x| &self.values[x])
@@ -79,6 +78,18 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
 
     pub fn count_edges(&self) -> usize {
         self.adj.iter().map(|x| x.len()).sum::<usize>() / 2
+    }
+
+    pub(crate) fn get_index(&self, v: &T) -> Option<&usize> {
+        self.index.get(v)
+    }
+
+    pub(crate) fn get_value(&self, index: usize) -> Option<T> {
+        if index < self.values.len() {
+            Some(self.values[index].clone())
+        } else {
+            None
+        }
     }
 
     pub fn vertices(&self) -> impl Iterator<Item = &T> {
@@ -109,7 +120,7 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
     ///
     /// * `v`: Vertex
     pub fn degree(&self, v: &T) -> Option<usize> {
-        self.index.get(v).map(|&x| self.adj[x].len())
+        self.get_index(v).map(|&x| self.adj[x].len())
     }
 
     pub fn max_degree(&self) -> usize {
@@ -124,6 +135,18 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
 
     pub fn average_degree(&self) -> f64 {
         2.0 * self.count_edges() as f64 / self.count_vertices() as f64
+    }
+}
+
+impl<T> Finder<T> for Graph<T> {
+    fn dfs(&self, v: T, w: T) -> impl Iterator<Item = T> {
+        let maked: Vec<bool> = vec![false; self.values.len()];
+        // NOTE: temporarily returning a empty iterator
+        Vec::new().into_iter()
+    }
+    fn bfs(&self, v: T, w: T) -> impl Iterator<Item = T> {
+        // NOTE: temporarily returning a empty iterator
+        Vec::new().into_iter()
     }
 }
 
@@ -177,7 +200,7 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
         }
 
         // We can assume x and y exists as vertices.
-        if let (Some(&x), Some(&y)) = (self.index.get(&x), self.index.get(&y)) {
+        if let (Some(&x), Some(&y)) = (self.get_index(&x), self.get_index(&y)) {
             // only add an edge if it doesn't exist
             self.adj[x].insert(y);
         };
@@ -186,8 +209,7 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
     ///
     /// * `v`: vertex
     pub fn adjacent_vertices(&self, v: &T) -> impl Iterator<Item = &T> {
-        self.index
-            .get(v)
+        self.get_index(v)
             .into_iter()
             .flat_map(move |&x| self.adj[x].iter())
             .map(|&x| &self.values[x])
@@ -205,6 +227,18 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
         self.values.iter()
     }
 
+    pub(crate) fn get_index(&self, v: &T) -> Option<&usize> {
+        self.index.get(v)
+    }
+
+    pub(crate) fn get_value(&self, index: usize) -> Option<T> {
+        if index < self.values.len() {
+            Some(self.values[index].clone())
+        } else {
+            None
+        }
+    }
+
     /// return true if there is an edge between x and y. It cares about
     /// direction from x to y not y to x
     ///
@@ -219,8 +253,8 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
             return true;
         }
 
-        let x_index = self.index.get(x);
-        let y_index = self.index.get(y);
+        let x_index = self.get_index(x);
+        let y_index = self.get_index(y);
 
         if let (Some(&x_index), Some(y_index)) = (x_index, y_index) {
             self.adj[x_index].contains(y_index)
