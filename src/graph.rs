@@ -105,8 +105,8 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
             return true;
         }
 
-        let x_index = self.index.get(x);
-        let y_index = self.index.get(y);
+        let x_index = self.get_index(x);
+        let y_index = self.get_index(y);
 
         if let (Some(&x_index), Some(y_index)) = (x_index, y_index) {
             self.adj[x_index].contains(y_index)
@@ -138,9 +138,11 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
     }
 }
 
-impl<T> Finder<T> for Graph<T> {
+impl<T: Eq + Hash + Clone + PartialEq> Finder<T> for Graph<T> {
     fn dfs(&self, v: T, w: T) -> impl Iterator<Item = T> {
         let maked: Vec<bool> = vec![false; self.values.len()];
+
+        let starting_vertex = self.get_index(&v);
         // NOTE: temporarily returning a empty iterator
         Vec::new().into_iter()
     }
