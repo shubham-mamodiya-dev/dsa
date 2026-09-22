@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet};
 use std::hash::Hash;
+use std::iter;
 
 #[derive(Debug, Default)]
 pub struct Graph<T> {
@@ -128,6 +129,13 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
     pub fn average_degree(&self) -> f64 {
         2.0 * self.count_edges() as f64 / self.count_vertices() as f64
     }
+
+    pub fn dfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
+        todo!()
+    }
+    pub fn bfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
+        todo!()
+    }
 }
 
 #[derive(Debug, Default)]
@@ -232,5 +240,12 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
         } else {
             false
         }
+    }
+
+    pub fn dfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
+        todo!()
+    }
+    pub fn bfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
+        todo!()
     }
 }
