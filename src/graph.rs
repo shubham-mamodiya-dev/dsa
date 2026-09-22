@@ -84,14 +84,6 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
         self.index.get(v)
     }
 
-    pub(crate) fn get_value(&self, index: usize) -> Option<T> {
-        if index < self.values.len() {
-            Some(self.values[index].clone())
-        } else {
-            None
-        }
-    }
-
     pub fn vertices(&self) -> impl Iterator<Item = &T> {
         self.values.iter()
     }
@@ -135,20 +127,6 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
 
     pub fn average_degree(&self) -> f64 {
         2.0 * self.count_edges() as f64 / self.count_vertices() as f64
-    }
-}
-
-impl<T: Eq + Hash + Clone + PartialEq> Finder<T> for Graph<T> {
-    fn dfs(&self, v: T, w: T) -> impl Iterator<Item = T> {
-        let maked: Vec<bool> = vec![false; self.values.len()];
-
-        let starting_vertex = self.get_index(&v);
-        // NOTE: temporarily returning a empty iterator
-        Vec::new().into_iter()
-    }
-    fn bfs(&self, v: T, w: T) -> impl Iterator<Item = T> {
-        // NOTE: temporarily returning a empty iterator
-        Vec::new().into_iter()
     }
 }
 
@@ -232,15 +210,6 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
     pub(crate) fn get_index(&self, v: &T) -> Option<&usize> {
         self.index.get(v)
     }
-
-    pub(crate) fn get_value(&self, index: usize) -> Option<T> {
-        if index < self.values.len() {
-            Some(self.values[index].clone())
-        } else {
-            None
-        }
-    }
-
     /// return true if there is an edge between x and y. It cares about
     /// direction from x to y not y to x
     ///
@@ -264,9 +233,4 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
             false
         }
     }
-}
-
-trait Finder<T> {
-    fn dfs(&self, v: T, w: T) -> impl Iterator<Item = T>;
-    fn bfs(&self, v: T, w: T) -> impl Iterator<Item = T>;
 }
