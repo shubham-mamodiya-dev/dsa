@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::hash::Hash;
 use std::iter;
 
@@ -197,19 +197,65 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
             }
         }
     }
-    // pub fn path_with_bfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
-    //     todo!()
-    // }
+
+    pub fn path_with_bfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
+        // Making sure v and w exists in the graph
+        if self.get_index(v).is_none() || self.get_index(w).is_none() {
+            return Vec::new().into_iter();
+        }
+
+        // Finding a path between.
+
+        let mut edge_to: Vec<usize> = (0..self.count_vertices()).collect();
+        let mut marked = vec![false; self.count_vertices()];
+        let &starting_vertex = self.get_index(v).unwrap();
+        let &destination_vertex = self.get_index(w).unwrap();
+        let mut frontier = VecDeque::new();
+
+        frontier.push_front(starting_vertex);
+        marked[starting_vertex] = true;
+
+        while !frontier.is_empty() {
+            if let Some(current_vertex) = frontier.pop_front() {
+                for &adj in self.adjacent_vertex_indices_from_index(current_vertex) {
+                    if !marked[adj] {
+                        frontier.push_front(adj);
+                        marked[adj] = true;
+                        edge_to[adj] = current_vertex;
+
+                        if adj == destination_vertex {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if marked[starting_vertex] == marked[destination_vertex] {
+            let mut next = destination_vertex;
+            let mut path: Vec<T> = Vec::new();
+            while next != starting_vertex {
+                path.push(self.value(next));
+                next = edge_to[next];
+            }
+            // pushing the destination_vertex
+            path.push(self.values[next].clone());
+            path.reverse();
+            path.into_iter()
+        } else {
+            Vec::new().into_iter()
+        }
+        // If they are connected then from destination_vertex trace the starting_vertex
+    }
 }
 
 #[derive(Debug, Default)]
-pub struct Diagraph<T> {
+pub struct Digraph<T> {
     adj: Vec<HashSet<usize>>,
     values: Vec<T>,
     index: HashMap<T, usize>,
 }
 
-impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
+impl<T: Eq + Clone + PartialEq + Hash> Digraph<T> {
     pub fn new() -> Self {
         Self {
             adj: Vec::new(),
