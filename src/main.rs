@@ -1,4 +1,4 @@
-use dsa::graph::Graph;
+use dsa::graph::{Diagraph, Graph};
 
 fn main() {
     let mut g: Graph<i32> = Graph::new();
@@ -28,7 +28,7 @@ fn main() {
     // for x in g.adjacent_vertices(&4) {
     //     print!("{}, ", x);
     // }
-    let mut g = Graph::new();
+    let mut g = Diagraph::new();
 
     let vertices = [
         "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",

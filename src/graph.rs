@@ -320,4 +320,58 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
             false
         }
     }
+
+    pub(crate) fn value(&self, i: usize) -> T {
+        self.values[i].clone()
+    }
+
+    pub fn path_with_dfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
+        // Making sure v and w exists in the graph
+        if self.get_index(v).is_none() || self.get_index(w).is_none() {
+            return Vec::new().into_iter();
+        }
+
+        // Finding a path between.
+
+        let mut edge_to: Vec<usize> = (0..self.count_vertices()).collect();
+        let mut marked = vec![false; self.count_vertices()];
+        let &starting_vertex = self.get_index(v).unwrap();
+        let &destination_vertex = self.get_index(w).unwrap();
+
+        self.dfs(
+            starting_vertex,
+            destination_vertex,
+            &mut marked,
+            &mut edge_to,
+        );
+
+        // If they are connected then from destination_vertex trace the starting_vertex
+        if marked[starting_vertex] == marked[destination_vertex] {
+            let mut next = destination_vertex;
+            let mut path: Vec<T> = Vec::new();
+            while next != starting_vertex {
+                path.push(self.value(next));
+                next = edge_to[next];
+            }
+            // pushing the destination_vertex
+            path.push(self.values[next].clone());
+            path.reverse();
+            path.into_iter()
+        } else {
+            Vec::new().into_iter()
+        }
+    }
+
+    fn dfs(&self, v: usize, w: usize, marked: &mut [bool], edge_to: &mut [usize]) {
+        marked[v] = true;
+        for &adj in self.adjacent_vertex_indices_from_index(v) {
+            if !marked[adj] {
+                self.dfs(adj, w, marked, edge_to);
+                edge_to[adj] = v;
+                if adj == w {
+                    return;
+                }
+            }
+        }
+    }
 }
