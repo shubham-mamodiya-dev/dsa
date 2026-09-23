@@ -61,10 +61,28 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
     pub fn adjacent_vertices(&self, v: &T) -> impl Iterator<Item = &T> {
         self.get_index(v)
             .into_iter()
+            // Above iterator only returns one element the index
             .flat_map(move |&x| self.adj[x].iter())
             .map(|&x| &self.values[x])
     }
 
+    pub(crate) fn adjacent_vertex_indices(&self, v: &T) -> impl Iterator<Item = &usize> {
+        self.get_index(v)
+            .into_iter()
+            // Above iterator only returns one element the index
+            .flat_map(move |&x| self.adj[x].iter())
+    }
+
+    pub(crate) fn value(&self, i: usize) -> T {
+        self.values[i].clone()
+    }
+
+    pub(crate) fn adjacent_vertex_indices_from_index(
+        &self,
+        i: usize,
+    ) -> impl Iterator<Item = &usize> {
+        self.adj[i].iter()
+    }
     /// Checks if Vertex exists in the graph
     ///
     /// * `v`: Vertex
@@ -130,12 +148,58 @@ impl<T: Eq + Hash + Clone + PartialEq> Graph<T> {
         2.0 * self.count_edges() as f64 / self.count_vertices() as f64
     }
 
-    pub fn dfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
-        todo!()
+    pub fn path_with_dfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
+        // Making sure v and w exists in the graph
+        if self.get_index(v).is_none() || self.get_index(w).is_none() {
+            return Vec::new().into_iter();
+        }
+
+        // Finding a path between.
+
+        let mut edge_to: Vec<usize> = (0..self.count_vertices()).collect();
+        let mut marked = vec![false; self.count_vertices()];
+        let &starting_vertex = self.get_index(v).unwrap();
+        let &destination_vertex = self.get_index(w).unwrap();
+
+        self.dfs(
+            starting_vertex,
+            destination_vertex,
+            &mut marked,
+            &mut edge_to,
+        );
+
+        // If they are connected then from destination_vertex trace the starting_vertex
+        if marked[starting_vertex] == marked[destination_vertex] {
+            let mut next = destination_vertex;
+            let mut path: Vec<T> = Vec::new();
+            while next != starting_vertex {
+                path.push(self.value(next));
+                next = edge_to[next];
+            }
+            // pushing the destination_vertex
+            path.push(self.values[next].clone());
+            path.reverse();
+            path.into_iter()
+        } else {
+            Vec::new().into_iter()
+        }
     }
-    pub fn bfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
-        todo!()
+
+    fn dfs(&self, v: usize, w: usize, marked: &mut [bool], edge_to: &mut [usize]) {
+        marked[v] = true;
+        for &adj in self.adjacent_vertex_indices_from_index(v) {
+            if !marked[adj] {
+                self.dfs(adj, w, marked, edge_to);
+                edge_to[adj] = v;
+                if adj == w {
+                    return;
+                }
+            }
+        }
     }
+    // pub fn path_with_bfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
+    //     todo!()
+    // }
 }
 
 #[derive(Debug, Default)]
@@ -218,6 +282,21 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
     pub(crate) fn get_index(&self, v: &T) -> Option<&usize> {
         self.index.get(v)
     }
+
+    pub(crate) fn adjacent_vertex_indices(&self, v: &T) -> impl Iterator<Item = &usize> {
+        self.get_index(v)
+            .into_iter()
+            // Above iterator only returns one element the index
+            .flat_map(move |&x| self.adj[x].iter())
+    }
+
+    pub(crate) fn adjacent_vertex_indices_from_index(
+        &self,
+        i: usize,
+    ) -> impl Iterator<Item = &usize> {
+        self.adj[i].iter()
+    }
+
     /// return true if there is an edge between x and y. It cares about
     /// direction from x to y not y to x
     ///
@@ -240,12 +319,5 @@ impl<T: Eq + Clone + PartialEq + Hash> Diagraph<T> {
         } else {
             false
         }
-    }
-
-    pub fn dfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
-        todo!()
-    }
-    pub fn bfs(&self, v: &T, w: &T) -> impl Iterator<Item = T> {
-        todo!()
     }
 }
