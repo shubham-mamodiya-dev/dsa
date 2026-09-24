@@ -480,7 +480,7 @@ pub struct CC<T> {
     marked: Vec<bool>,
     edge_to: Vec<usize>,
     connected_groups: Vec<usize>,
-    digraphic: bool,
+    count: usize,
 }
 
 impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
@@ -492,19 +492,7 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
             marked: Vec::new(),
             edge_to: Vec::new(),
             connected_groups: Vec::new(),
-            digraphic: false,
-        }
-    }
-
-    pub fn diagraphic() -> Self {
-        Self {
-            adj: Vec::new(),
-            index: HashMap::new(),
-            values: Vec::new(),
-            marked: Vec::new(),
-            edge_to: Vec::new(),
-            connected_groups: Vec::new(),
-            digraphic: true,
+            count: 0,
         }
     }
 
@@ -529,13 +517,8 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
         // We can assume x and y exists as vertices.
         if let (Some(&x), Some(&y)) = (self.index.get(&x), self.index.get(&y)) {
             self.adj[x].insert(y);
-            if !self.is_digraphic() {
-                self.adj[y].insert(x);
-            }
+            self.adj[y].insert(x);
         };
-    }
-    pub fn is_digraphic(&self) -> bool {
-        self.digraphic
     }
     /// Adds vertex in the graph only if it doesn't exist yet.
     ///
@@ -553,7 +536,8 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
         self.index.insert(v, index);
         self.marked.push(false);
         self.edge_to.push(index);
-        self.connected_groups.push(index);
+        self.connected_groups.push(self.count);
+        self.count += 1;
     }
 
     pub fn adjacent_vertices(&self, v: &T) -> impl Iterator<Item = &T> {
