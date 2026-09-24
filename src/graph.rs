@@ -619,6 +619,7 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
         if self.contains(v) || self.contains(w) {
             false
         } else {
+            // TODO: remove building step or make it efficient
             if self.needs_rebuilding {
                 self.build();
             }
@@ -635,6 +636,8 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
     }
     pub fn build(&mut self) {
         self.count = 0;
+        self.marked = vec![false; self.count_vertices()];
+
         let indices: Vec<usize> = self.indices().copied().collect();
         for w in indices {
             if !self.marked[w] {
