@@ -480,6 +480,7 @@ pub struct CC<T> {
     marked: Vec<bool>,
     edge_to: Vec<usize>,
     connected_groups: Vec<usize>,
+    digraphic: bool,
 }
 
 impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
@@ -491,6 +492,19 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
             marked: Vec::new(),
             edge_to: Vec::new(),
             connected_groups: Vec::new(),
+            digraphic: false,
+        }
+    }
+
+    pub fn diagraphic() -> Self {
+        Self {
+            adj: Vec::new(),
+            index: HashMap::new(),
+            values: Vec::new(),
+            marked: Vec::new(),
+            edge_to: Vec::new(),
+            connected_groups: Vec::new(),
+            digraphic: true,
         }
     }
 
@@ -515,10 +529,14 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
         // We can assume x and y exists as vertices.
         if let (Some(&x), Some(&y)) = (self.index.get(&x), self.index.get(&y)) {
             self.adj[x].insert(y);
-            self.adj[y].insert(x);
+            if !self.is_digraphic() {
+                self.adj[y].insert(x);
+            }
         };
     }
-
+    pub fn is_digraphic(&self) -> bool {
+        self.digraphic
+    }
     /// Adds vertex in the graph only if it doesn't exist yet.
     ///
     /// * `v`: The vertex
