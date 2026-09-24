@@ -1,5 +1,6 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::hash::Hash;
+use std::iter;
 
 #[derive(Debug, Default)]
 pub struct Graph<T> {
@@ -481,6 +482,7 @@ pub struct CC<T> {
     edge_to: Vec<usize>,
     connected_groups: Vec<usize>,
     count: usize,
+    needs_rebuilding: bool,
 }
 
 impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
@@ -493,6 +495,7 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
             edge_to: Vec::new(),
             connected_groups: Vec::new(),
             count: 0,
+            needs_rebuilding: false,
         }
     }
 
@@ -519,6 +522,8 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
             self.adj[x].insert(y);
             self.adj[y].insert(x);
         };
+
+        self.needs_rebuilding = true;
     }
     /// Adds vertex in the graph only if it doesn't exist yet.
     ///
@@ -588,6 +593,9 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
         self.values.iter()
     }
 
+    pub fn indices(&self) -> impl Iterator<Item = &usize> {
+        self.index.values()
+    }
     pub fn is_edge(&self, x: &T, y: &T) -> bool {
         if !self.contains(x) || !self.contains(y) {
             return false;
@@ -607,6 +615,51 @@ impl<T: Eq + Hash + Clone + PartialEq> CC<T> {
         }
     }
 
+    pub fn is_connected(&mut self, v: &T, w: &T) -> bool {
+        if self.contains(v) || self.contains(w) {
+            false
+        } else {
+            if self.needs_rebuilding {
+                self.build();
+            }
+
+            let x_index = self.get_index(v);
+            let y_index = self.get_index(w);
+
+            if let (Some(&x_index), Some(&y_index)) = (x_index, y_index) {
+                self.connected_groups[x_index] == self.connected_groups[y_index]
+            } else {
+                false
+            }
+        }
+    }
+    pub fn build(&mut self) {
+        self.count = 0;
+        let indices: Vec<usize> = self.indices().copied().collect();
+        for w in indices {
+            if !self.marked[w] {
+                self.dfs_crawler(w);
+                self.connected_groups[w] = self.count;
+                self.count += 1;
+            }
+        }
+    }
+
+    fn dfs_crawler(&mut self, v: usize) {
+        self.marked[v] = true;
+
+        let neighbors: Vec<usize> = self
+            .adjacent_vertex_indices_from_index(v)
+            .copied()
+            .collect();
+
+        for w in neighbors {
+            if !self.marked[w] {
+                self.dfs_crawler(w);
+                self.edge_to[w] = v;
+            }
+        }
+    }
     pub fn average_degree(&self) -> f64 {
         2.0 * self.count_edges() as f64 / self.count_vertices() as f64
     }
