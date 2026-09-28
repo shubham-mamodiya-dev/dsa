@@ -17,4 +17,14 @@ class Graph {
 
 public:
   Graph();
+
+  VertexID add_vertex();
+
+  /**
+   * @brief It adds edge between vertex v and vertex w only if v and w exists
+   * in the graph.
+   *
+   * @return true if edge is added else false.
+   */
+  bool add_edge(VertexID v, VertexID w);
 };
