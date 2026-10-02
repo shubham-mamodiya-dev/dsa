@@ -59,19 +59,7 @@ size_t Graph::vertex_count() const {
   return this->adj.size() - this->reusable.size();
 }
 
-size_t Graph::edge_count() const {
-
-  // NOTE: vertices that are removed have 0 elements in there adj.
-  size_t total_edges = 0;
-  for (const auto &x : this->adj) {
-    total_edges += x.size();
-  }
-
-  // In a graph edges are bidirectional and counted twice.
-  total_edges /= 2;
-
-  return total_edges;
-}
+size_t Graph::edge_count() const { return this->_edge_count; }
 
 bool Graph::is_connected(const VertexID v, const VertexID w) const {
   if (!this->is_valid_vertex(v) || !this->is_valid_vertex(w)) {
@@ -101,4 +89,11 @@ bool Graph::remove_edge(const VertexID v, const VertexID w) {
   this->adj[w].erase(v);
   this->_edge_count -= 1;
   return true;
+}
+
+std::vector<VertexID> Graph::adjacent_vertices(const VertexID v) {
+  if (this->is_valid_vertex(v)) {
+    return {this->adj[v].begin(), this->adj[v].end()};
+  }
+  return {};
 }
