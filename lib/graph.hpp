@@ -43,6 +43,12 @@ public:
 
   bool remove_vertex(VertexID id);
 
+  /**
+   * @brief Calculates the total number of Vertices. It doesn't count vertices
+   * that were deleted before.
+   *
+   * @return Count of vertices.
+   */
   size_t vertex_count();
 
   /**
