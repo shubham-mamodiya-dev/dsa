@@ -10,7 +10,7 @@ VertexID Graph::add_vertex() {
   if (!this->reusable.empty()) {
     auto it = this->reusable.begin();
     id = *it;
-    this->remove_vertex(id);
+    this->reusable.erase(id);
   } else {
     id = adj.size();
     adj.emplace_back();
@@ -19,15 +19,7 @@ VertexID Graph::add_vertex() {
 }
 
 bool Graph::add_edge(VertexID v, VertexID w) {
-  if (v < 0 || w < 0) {
-    return false;
-  }
-  if (v >= this->adj.size() || w >= this->adj.size()) {
-    return false;
-  }
-
-  // NOTE: reusable vertices are the vertices that were deleted before.
-  if (this->is_reusable(v) || this->is_reusable(w)) {
+  if (!this->is_valid_vertex(v) || !this->is_valid_vertex(w)) {
     return false;
   }
 
@@ -42,16 +34,7 @@ bool Graph::add_edge(VertexID v, VertexID w) {
 }
 
 bool Graph::remove_vertex(VertexID id) {
-  if (id < 0) {
-    return false;
-  }
-  // Can't remove it because it is not in the graph
-  if (id >= this->adj.size()) {
-    return false;
-  }
-
-  // Can't remove it because it is already removed
-  if (this->is_reusable(id)) {
+  if (!this->is_valid_vertex(id)) {
     return false;
   }
 
@@ -69,11 +52,11 @@ bool Graph::remove_vertex(VertexID id) {
   return true;
 }
 
-size_t Graph::vertex_count() {
+size_t Graph::vertex_count() const {
   return this->adj.size() - this->reusable.size();
 }
 
-size_t Graph::edge_count() {
+size_t Graph::edge_count() const {
 
   // NOTE: vertices that are removed have 0 elements in there adj.
   size_t total_edges = 0;
@@ -87,17 +70,8 @@ size_t Graph::edge_count() {
   return total_edges;
 }
 
-bool Graph::is_connected(VertexID v, VertexID w) {
-  if (v < 0 || w < 0) {
-    return false;
-  }
-
-  if (v >= this->adj.size() || w >= this->adj.size()) {
-    return false;
-  }
-
-  // NOTE: reusable vertices are the vertices that were deleted before.
-  if (this->is_reusable(v) || this->is_reusable(w)) {
+bool Graph::is_connected(VertexID v, VertexID w) const {
+  if (!this->is_valid_vertex(v) || !this->is_valid_vertex(w)) {
     return false;
   }
 
@@ -106,4 +80,9 @@ bool Graph::is_connected(VertexID v, VertexID w) {
   return this->adj[v].contains(w);
 }
 
-bool Graph::is_reusable(VertexID v) { return this->reusable.contains(v); }
+bool Graph::is_reusable(VertexID v) const { return this->reusable.contains(v); }
+
+bool Graph::is_valid_vertex(VertexID v) const {
+  return v >= 0 && v < static_cast<VertexID>(adj.size()) &&
+         !reusable.contains(v);
+}

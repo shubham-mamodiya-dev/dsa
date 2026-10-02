@@ -47,22 +47,26 @@ public:
    * @brief Calculates the total number of Vertices. It doesn't count vertices
    * that were deleted before.
    */
-  size_t vertex_count();
+  size_t vertex_count() const;
 
   /**
    * @brief Calculates the count of edges in the graph. It does not count and
    * edge for self loop for example it does not count for x is connected to x.
    */
-  size_t edge_count();
+  size_t edge_count() const;
 
   /**
    * @brief Checks is v connected to w and w connected to v.
    */
-  bool is_connected(VertexID v, VertexID w);
+  bool is_connected(VertexID v, VertexID w) const;
 
   /**
    * @brief It checks if the given vertex is reusable. The vertices that were
    * deleted from the graph are re-used.
    */
-  bool is_reusable(VertexID v);
+  bool is_reusable(VertexID v) const;
+
+  std::vector<VertexID> adjacent_vertices(VertexID v);
+
+  bool is_valid_vertex(VertexID v) const;
 };
