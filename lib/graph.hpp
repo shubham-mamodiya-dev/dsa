@@ -13,6 +13,7 @@
 using VertexID = size_t;
 
 class Graph {
+public:
   std::vector<std::unordered_set<VertexID>> adj;
   /**
    * @brief recently_removed keeps those vertices that are deleted explicitly
@@ -35,7 +36,8 @@ public:
    * @brief It adds edge between vertex v and vertex w only if v and w exists
    * in the graph.
    *
-   * @return true if edge is added else false.
+   * @return true if edge is added else false. false may mean two things either
+   * v or w doesn't exist in the graph or one of them was recently removed.
    */
   bool add_edge(VertexID v, VertexID w);
 };

@@ -2,10 +2,11 @@
 
 #include "graph.hpp"
 
-Graph::Graph() : adj{} {}
+Graph::Graph() = default;
 
 VertexID Graph::add_vertex() {
   VertexID id;
+  // TODO: remove vertex properly
   if (!this->recently_removed.empty()) {
     auto it = this->recently_removed.begin();
     id = *it;

@@ -11,3 +11,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory("lib")
 add_subdirectory("src")
+
+
+include(FetchContent)
+
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+  GIT_TAG 12.2.0
+)
+FetchContent_MakeAvailable(fmt)
