@@ -42,4 +42,14 @@ public:
   bool add_edge(VertexID v, VertexID w);
 
   bool remove_vertex(VertexID id);
+
+  size_t vertex_count();
+
+  /**
+   * @brief Calculates the count of edges in the graph. It does not count and
+   * edge for self loop for example it does not count for x is connected to x.
+   *
+   * @return  Total number of edges in the graph.
+   */
+  size_t edge_count();
 };

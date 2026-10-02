@@ -1,6 +1,7 @@
 
 
 #include "graph.hpp"
+#include <cstddef>
 
 Graph::Graph() = default;
 
@@ -27,6 +28,11 @@ bool Graph::add_edge(VertexID v, VertexID w) {
 
   if (this->reusable.contains(v) || this->reusable.contains(w)) {
     return false;
+  }
+
+  // A vertex is connected to itself and We do not keep entries for that.
+  if (v == w) {
+    return true;
   }
 
   adj[v].insert(w);
@@ -60,4 +66,22 @@ bool Graph::remove_vertex(VertexID id) {
   this->adj[id].clear();
 
   return true;
+}
+
+size_t Graph::vertex_count() {
+  return this->adj.size() - this->reusable.size();
+}
+
+size_t Graph::edge_count() {
+
+  // NOTE: vertices that are removed have 0 elements in there adj.
+  size_t total_edges = 0;
+  for (const auto &x : this->adj) {
+    total_edges += x.size();
+  }
+
+  // In a graph edges are bidirectional and counted twice.
+  total_edges /= 2;
+
+  return total_edges;
 }
