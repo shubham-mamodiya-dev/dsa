@@ -14,10 +14,21 @@ using VertexID = size_t;
 
 class Graph {
   std::vector<std::unordered_set<VertexID>> adj;
+  /**
+   * @brief recently_removed keeps those vertices that are deleted explicitly
+   * from the graph. These vertices are re-utilized afterwards.
+   */
+  std::unordered_set<VertexID> recently_removed;
 
 public:
   Graph();
 
+  /**
+   * @brief it adds vertex then returns its id. This id will be used for
+   * interacting with it.
+   *
+   * @return size_t or VertexID.
+   */
   VertexID add_vertex();
 
   /**

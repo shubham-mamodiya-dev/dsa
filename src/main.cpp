@@ -2,7 +2,7 @@
 #include <iostream>
 
 int main() {
-  std::cout << "==================== DSA Implementaions ====================\n";
-
+  std::cout
+      << "==================== DSA Implementations ====================\n";
   return 0;
 }

@@ -5,13 +5,25 @@
 Graph::Graph() : adj{} {}
 
 VertexID Graph::add_vertex() {
-  VertexID id{adj.size()};
-  adj.emplace_back();
+  VertexID id;
+  if (!this->recently_removed.empty()) {
+    auto it = this->recently_removed.begin();
+    id = *it;
+    this->recently_removed.erase(it);
+  } else {
+    id = adj.size();
+    adj.emplace_back();
+  }
   return id;
 }
 
 bool Graph::add_edge(VertexID v, VertexID w) {
-  if (v >= adj.size() || w >= adj.size()) {
+  if (v >= this->adj.size() || w >= this->adj.size()) {
+    return false;
+  }
+
+  if (this->recently_removed.contains(v) ||
+      this->recently_removed.contains(w)) {
     return false;
   }
 
