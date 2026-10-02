@@ -28,7 +28,7 @@ public:
    * @brief it adds vertex then returns its id. This id will be used for
    * interacting with it.
    *
-   * @return size_t or VertexID.
+   * @return int64_t as VertexID.
    */
   VertexID add_vertex();
 
@@ -46,16 +46,23 @@ public:
   /**
    * @brief Calculates the total number of Vertices. It doesn't count vertices
    * that were deleted before.
-   *
-   * @return Count of vertices.
    */
   size_t vertex_count();
 
   /**
    * @brief Calculates the count of edges in the graph. It does not count and
    * edge for self loop for example it does not count for x is connected to x.
-   *
-   * @return  Total number of edges in the graph.
    */
   size_t edge_count();
+
+  /**
+   * @brief Checks is v connected to w and w connected to v.
+   */
+  bool is_connected(VertexID v, VertexID w);
+
+  /**
+   * @brief It checks if the given vertex is reusable. The vertices that were
+   * deleted from the graph are re-used.
+   */
+  bool is_reusable(VertexID v);
 };

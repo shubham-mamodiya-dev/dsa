@@ -26,7 +26,8 @@ bool Graph::add_edge(VertexID v, VertexID w) {
     return false;
   }
 
-  if (this->reusable.contains(v) || this->reusable.contains(w)) {
+  // NOTE: reusable vertices are the vertices that were deleted before.
+  if (this->is_reusable(v) || this->is_reusable(w)) {
     return false;
   }
 
@@ -50,7 +51,7 @@ bool Graph::remove_vertex(VertexID id) {
   }
 
   // Can't remove it because it is already removed
-  if (this->reusable.contains(id)) {
+  if (this->is_reusable(id)) {
     return false;
   }
 
@@ -85,3 +86,24 @@ size_t Graph::edge_count() {
 
   return total_edges;
 }
+
+bool Graph::is_connected(VertexID v, VertexID w) {
+  if (v < 0 || w < 0) {
+    return false;
+  }
+
+  if (v >= this->adj.size() || w >= this->adj.size()) {
+    return false;
+  }
+
+  // NOTE: reusable vertices are the vertices that were deleted before.
+  if (this->is_reusable(v) || this->is_reusable(w)) {
+    return false;
+  }
+
+  // Edges in graphs are bidirectional. But, We are checking only for one
+  // direction
+  return this->adj[v].contains(w);
+}
+
+bool Graph::is_reusable(VertexID v) { return this->reusable.contains(v); }
