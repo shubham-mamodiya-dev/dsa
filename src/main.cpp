@@ -47,7 +47,12 @@ int main() {
   g.add_edge(vertices[12], vertices[18]);
   g.add_edge(vertices[13], vertices[19]);
 
+  g.add_edge(vertices[0], vertices[19]);
+
+  g.remove_vertex(300);
+  g.remove_vertex(-300);
+
   fmt::println("adj: {}", g.adj);
-  fmt::println("Recently Removed: ", g.recently_removed);
+  fmt::println("Recently Removed: ", g.reusable);
   return 0;
 }

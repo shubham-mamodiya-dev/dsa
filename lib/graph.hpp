@@ -6,11 +6,11 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstdint>
 #include <unordered_set>
 #include <vector>
 
-using VertexID = size_t;
+using VertexID = int64_t;
 
 class Graph {
 public:
@@ -19,7 +19,7 @@ public:
    * @brief recently_removed keeps those vertices that are deleted explicitly
    * from the graph. These vertices are re-utilized afterwards.
    */
-  std::unordered_set<VertexID> recently_removed;
+  std::unordered_set<VertexID> reusable;
 
 public:
   Graph();
@@ -40,4 +40,6 @@ public:
    * v or w doesn't exist in the graph or one of them was recently removed.
    */
   bool add_edge(VertexID v, VertexID w);
+
+  bool remove_vertex(VertexID id);
 };
