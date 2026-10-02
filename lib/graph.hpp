@@ -69,5 +69,6 @@ public:
    */
   bool is_reusable(const VertexID v) const;
 
+  bool remove_edge(const VertexID v, const VertexID w);
   std::vector<VertexID> adjacent_vertices(const VertexID v);
 };

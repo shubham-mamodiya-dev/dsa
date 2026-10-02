@@ -91,3 +91,14 @@ bool Graph::is_valid_vertex(const VertexID v) const {
   return v >= 0 && v < static_cast<VertexID>(adj.size()) &&
          !reusable.contains(v);
 }
+
+bool Graph::remove_edge(const VertexID v, const VertexID w) {
+  if (!this->is_valid_vertex(v) || !this->is_valid_vertex(w)) {
+    return false;
+  }
+
+  this->adj[v].erase(w);
+  this->adj[w].erase(v);
+  this->_edge_count -= 1;
+  return true;
+}
