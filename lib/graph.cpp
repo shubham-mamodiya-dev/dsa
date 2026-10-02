@@ -6,19 +6,19 @@
 Graph::Graph() = default;
 
 VertexID Graph::add_vertex() {
-  VertexID id;
+  // First reusing vertices.
   if (!this->reusable.empty()) {
-    auto it = this->reusable.begin();
-    id = *it;
+    const VertexID id = *this->reusable.begin();
     this->reusable.erase(id);
-  } else {
-    id = adj.size();
-    adj.emplace_back();
+    return id;
   }
+
+  const VertexID id = adj.size();
+  adj.emplace_back();
   return id;
 }
 
-bool Graph::add_edge(VertexID v, VertexID w) {
+bool Graph::add_edge(const VertexID v, const VertexID w) {
   if (!this->is_valid_vertex(v) || !this->is_valid_vertex(w)) {
     return false;
   }
@@ -28,12 +28,13 @@ bool Graph::add_edge(VertexID v, VertexID w) {
     return true;
   }
 
-  adj[v].insert(w);
-  adj[w].insert(v);
+  this->adj[v].insert(w);
+  this->adj[w].insert(v);
+  this->_edge_count += 1;
   return true;
 }
 
-bool Graph::remove_vertex(VertexID id) {
+bool Graph::remove_vertex(const VertexID id) {
   if (!this->is_valid_vertex(id)) {
     return false;
   }
@@ -45,6 +46,8 @@ bool Graph::remove_vertex(VertexID id) {
   for (const auto v : this->adj[id]) {
     this->adj[v].erase(id);
   }
+
+  this->_edge_count -= static_cast<int64_t>(adj[id].size());
 
   // Remove all the outgoing connections.
   this->adj[id].clear();
@@ -70,7 +73,7 @@ size_t Graph::edge_count() const {
   return total_edges;
 }
 
-bool Graph::is_connected(VertexID v, VertexID w) const {
+bool Graph::is_connected(const VertexID v, const VertexID w) const {
   if (!this->is_valid_vertex(v) || !this->is_valid_vertex(w)) {
     return false;
   }
@@ -80,9 +83,11 @@ bool Graph::is_connected(VertexID v, VertexID w) const {
   return this->adj[v].contains(w);
 }
 
-bool Graph::is_reusable(VertexID v) const { return this->reusable.contains(v); }
+bool Graph::is_reusable(const VertexID v) const {
+  return this->reusable.contains(v);
+}
 
-bool Graph::is_valid_vertex(VertexID v) const {
+bool Graph::is_valid_vertex(const VertexID v) const {
   return v >= 0 && v < static_cast<VertexID>(adj.size()) &&
          !reusable.contains(v);
 }

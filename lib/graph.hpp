@@ -20,6 +20,9 @@ public:
    * from the graph. These vertices are re-utilized afterwards.
    */
   std::unordered_set<VertexID> reusable;
+  int64_t _edge_count = 0;
+
+  bool is_valid_vertex(const VertexID v) const;
 
 public:
   Graph();
@@ -39,9 +42,9 @@ public:
    * @return true if edge is added else false. false may mean two things either
    * v or w doesn't exist in the graph or one of them was recently removed.
    */
-  bool add_edge(VertexID v, VertexID w);
+  bool add_edge(const VertexID v, const VertexID w);
 
-  bool remove_vertex(VertexID id);
+  bool remove_vertex(const VertexID id);
 
   /**
    * @brief Calculates the total number of Vertices. It doesn't count vertices
@@ -58,15 +61,13 @@ public:
   /**
    * @brief Checks is v connected to w and w connected to v.
    */
-  bool is_connected(VertexID v, VertexID w) const;
+  bool is_connected(const VertexID v, const VertexID w) const;
 
   /**
    * @brief It checks if the given vertex is reusable. The vertices that were
    * deleted from the graph are re-used.
    */
-  bool is_reusable(VertexID v) const;
+  bool is_reusable(const VertexID v) const;
 
-  std::vector<VertexID> adjacent_vertices(VertexID v);
-
-  bool is_valid_vertex(VertexID v) const;
+  std::vector<VertexID> adjacent_vertices(const VertexID v);
 };
