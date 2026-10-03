@@ -1,6 +1,7 @@
 
 
 #include "digraph.hpp"
+#include <algorithm>
 #include <cstddef>
 
 Digraph::Digraph() = default;
@@ -94,9 +95,65 @@ bool Digraph::remove_edge(const VertexID v, const VertexID w) {
   return true;
 }
 
-std::vector<VertexID> Digraph::adjacent_vertices(const VertexID v) {
+std::vector<VertexID> Digraph::adjacent_vertices(const VertexID v) const {
   if (this->is_valid_vertex(v)) {
     return {this->adj[v].begin(), this->adj[v].end()};
   }
   return {};
 }
+
+std::vector<VertexID> Digraph::path_dfs(const VertexID v,
+                                        const VertexID w) const {
+  if (!this->is_valid_vertex(v) || !this->is_valid_vertex(w)) {
+    return {};
+  }
+
+  std::vector<bool> marked(this->total_vertices(), false);
+  std::vector<VertexID> edge_to(this->total_vertices());
+
+  for (int i = 0; i < this->total_vertices(); ++i) {
+    edge_to[i] = i;
+  }
+
+  this->dfs(v, w, marked, edge_to);
+
+  // if there is no path.
+  if (marked[v] != marked[w]) {
+    return {};
+  }
+
+  std::vector<VertexID> path{};
+  auto current{w};
+  while (current != v) {
+    path.push_back(current);
+    current = edge_to[current];
+  }
+  path.push_back(current);
+
+  std::reverse(path.begin(), path.end());
+
+  return path;
+}
+
+void Digraph::dfs(const VertexID v, const VertexID w, std::vector<bool> &marked,
+                  std::vector<VertexID> &edge_to) const {
+
+  marked[v] = true;
+
+  for (const auto adj : this->adjacent_vertices(v)) {
+    if (!marked[adj]) {
+
+      // if we found the destination then just return.
+      if (adj == w) {
+        marked[w] = true;
+        edge_to[w] = v;
+        return;
+      }
+
+      this->dfs(adj, w, marked, edge_to);
+      edge_to[adj] = v;
+    }
+  }
+}
+
+size_t Digraph::total_vertices() const { return this->adj.size(); }

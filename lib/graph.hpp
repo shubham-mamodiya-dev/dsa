@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "digraph.hpp"
 #include <cstdint>
 #include <unordered_set>
 #include <vector>
@@ -13,7 +14,7 @@
 using VertexID = int64_t;
 
 class Graph {
-private:
+protected:
   std::vector<std::unordered_set<VertexID>> adj;
   /**
    * @brief recently_removed keeps those vertices that are deleted explicitly
@@ -23,6 +24,9 @@ private:
   int64_t _edge_count = 0;
 
   bool is_valid_vertex(const VertexID v) const;
+
+  void dfs(const VertexID v, const VertexID w, std::vector<bool> &marked,
+           std::vector<VertexID> &edge_to) const;
 
 public:
   Graph();
@@ -51,7 +55,7 @@ public:
    * that were deleted before.
    */
   size_t vertex_count() const;
-
+  size_t total_vertices() const;
   /**
    * @brief Calculates the count of edges in the graph. It does not count and
    * edge for self loop for example it does not count for x is connected to x.
@@ -71,5 +75,7 @@ public:
 
   bool remove_edge(const VertexID v, const VertexID w);
 
-  std::vector<VertexID> adjacent_vertices(const VertexID v);
+  std::vector<VertexID> adjacent_vertices(const VertexID v) const;
+
+  std::vector<VertexID> path_dfs(const VertexID v, const VertexID w) const;
 };
