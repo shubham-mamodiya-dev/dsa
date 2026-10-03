@@ -13,7 +13,7 @@
 using VertexID = int64_t;
 
 class Graph {
-public:
+private:
   std::vector<std::unordered_set<VertexID>> adj;
   /**
    * @brief recently_removed keeps those vertices that are deleted explicitly

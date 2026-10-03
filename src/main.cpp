@@ -39,8 +39,6 @@ int main() {
 
   // g.remove_vertex(0);
 
-  fmt::println("adj: {}", g.adj);
-  fmt::println("Recently Removed: ", g.reusable);
   fmt::println("Total Vertices: {}", g.vertex_count());
   fmt::println("Total Edges: {}", g.edge_count());
   return 0;
