@@ -47,6 +47,8 @@ bool Graph::remove_vertex(const VertexID id) {
     this->adj[v].erase(id);
   }
 
+  // Edges in graphs are bidirectional. Deducing edges from one side is
+  // accurate.
   this->_edge_count -= static_cast<int64_t>(adj[id].size());
 
   // Remove all the outgoing connections.
