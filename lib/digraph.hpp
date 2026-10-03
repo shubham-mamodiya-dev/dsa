@@ -79,4 +79,6 @@ public:
 
   std::vector<VertexID> path_dfs(const VertexID v, const VertexID w) const;
   std::vector<VertexID> path_bfs(const VertexID v, const VertexID w) const;
+
+  bool is_connected(const VertexID v, const VertexID w) const;
 };

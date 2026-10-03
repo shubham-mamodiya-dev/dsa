@@ -207,3 +207,13 @@ std::vector<VertexID> Digraph::path_bfs(const VertexID v,
 
   return path;
 }
+
+bool Digraph::is_connected(const VertexID v, const VertexID w) const {
+  std::vector<VertexID> temp{this->path_dfs(v, w)};
+
+  // path_dfs always returns path if it exists.
+  if (temp.empty()) {
+    return false;
+  }
+  return true;
+}
