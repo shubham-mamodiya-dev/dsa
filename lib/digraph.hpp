@@ -61,9 +61,9 @@ public:
   size_t edge_count() const;
 
   /**
-   * @brief Checks is v connected to w and w connected to v.
+   * @brief Checks for v having an edge to w.
    */
-  bool is_connected(const VertexID v, const VertexID w) const;
+  bool is_edge(const VertexID v, const VertexID w) const;
 
   /**
    * @brief It checks if the given vertex is reusable. The vertices that were
@@ -78,4 +78,5 @@ public:
   size_t total_vertices() const;
 
   std::vector<VertexID> path_dfs(const VertexID v, const VertexID w) const;
+  std::vector<VertexID> path_bfs(const VertexID v, const VertexID w) const;
 };

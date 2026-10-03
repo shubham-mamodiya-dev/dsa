@@ -3,6 +3,7 @@
 #include "graph.hpp"
 #include <algorithm>
 #include <cstddef>
+#include <queue>
 #include <vector>
 
 Graph::Graph() = default;
@@ -65,7 +66,7 @@ size_t Graph::vertex_count() const {
 
 size_t Graph::edge_count() const { return this->_edge_count; }
 
-bool Graph::is_connected(const VertexID v, const VertexID w) const {
+bool Graph::is_edge(const VertexID v, const VertexID w) const {
   if (!this->is_valid_vertex(v) || !this->is_valid_vertex(w)) {
     return false;
   }
@@ -157,3 +158,52 @@ void Graph::dfs(const VertexID v, const VertexID w, std::vector<bool> &marked,
 }
 
 size_t Graph::total_vertices() const { return this->adj.size(); }
+
+std::vector<VertexID> Graph::path_bfs(const VertexID v,
+                                      const VertexID w) const {
+
+  std::queue<VertexID> frontier;
+  std::vector<VertexID> edge_to(this->total_vertices());
+
+  for (int i = 0; i < this->total_vertices(); ++i) {
+    edge_to[i] = i;
+  }
+
+  std::vector<bool> marked(this->total_vertices(), false);
+
+  frontier.push(v);
+  marked[v] = true;
+
+  auto found = false;
+  while (!frontier.empty() && !found) {
+    auto current{frontier.front()};
+
+    for (const auto adj : this->adjacent_vertices(current)) {
+      if (!marked[adj]) {
+        frontier.push(adj);
+        marked[adj] = true;
+        edge_to[adj] = current;
+
+        // stop if we found w.
+        if (adj == w) {
+          found = true;
+          break;
+        }
+      }
+    }
+  }
+
+  // We have to trace the path from w to v. Then reverse it to get a path from v
+  // to w.
+  std::vector<VertexID> path{};
+  auto current{w};
+  while (current != v) {
+    path.push_back(current);
+    current = edge_to[current];
+  }
+  path.push_back(current);
+
+  std::reverse(path.begin(), path.end());
+
+  return path;
+}
